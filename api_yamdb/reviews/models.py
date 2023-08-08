@@ -6,7 +6,6 @@ User = get_user_model()
 
 class Сomments(models.Model):
     text = models.TextField("Текст коментария")
-    mark = models.IntegerField()
     titles = models.ForeignKey(
         Titles,
         on_delete=models.CASCADE,
@@ -21,6 +20,7 @@ class Сomments(models.Model):
 
 class Reviews(models.Model):
     text = models.TextField("Текст отзыва")
+    mark = models.IntegerField()
     сomments = models.ForeignKey(
         Сomments,
         on_delete=models.CASCADE,
