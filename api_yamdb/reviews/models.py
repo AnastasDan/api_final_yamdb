@@ -4,12 +4,13 @@ from django.db import models
 User = get_user_model()
 
 
-class Сomments(models.Model):
-    text = models.TextField("Текст коментария")
+class Reviews(models.Model):
+    text = models.TextField("Текст отзыва")
+    mark = models.IntegerField()
     titles = models.ForeignKey(
         Titles,
         on_delete=models.CASCADE,
-        related_name="comments",
+        related_name="reviews",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -18,13 +19,12 @@ class Сomments(models.Model):
         ordering = ("created_at",)
 
 
-class Reviews(models.Model):
-    text = models.TextField("Текст отзыва")
-    mark = models.IntegerField()
-    сomments = models.ForeignKey(
-        Сomments,
+class Сomments(models.Model):
+    text = models.TextField("Текст коментария")
+    reviews = models.ForeignKey(
+        Reviews,
         on_delete=models.CASCADE,
-        related_name="reviews",
+        related_name="comments",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
