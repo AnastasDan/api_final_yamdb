@@ -1,9 +1,9 @@
 from rest_framework import serializers
+
 from users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
-
+class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             "email",
@@ -23,3 +23,22 @@ class TokenSerializer(serializers.Serializer):
         regex=r"^[\w.@+-]+$", max_length=150, required=True
     )
     confirmation_code = serializers.CharField(required=True)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            "email",
+            "username",
+            "first_name",
+            "last_name",
+            "bio",
+            "role",
+        )
+        model = User
+
+    def validate(self, data):
+        username = data.get("username")
+        if username == "me":
+            raise serializers.ValidationError("Использовать имя me запрещено.")
+        return data

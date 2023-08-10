@@ -1,5 +1,12 @@
-from django.urls import path
-from .views import SignupView, CustomTokenObtainPairView
+from django.urls import include, path
+
+from rest_framework import routers
+
+from .views import CustomTokenObtainPairView, SignupView, UserViewSet
+
+router = routers.DefaultRouter()
+router.register(r"users", UserViewSet)
+
 
 urlpatterns = [
     path(
@@ -12,4 +19,5 @@ urlpatterns = [
         CustomTokenObtainPairView.as_view({"post": "create"}),
         name="token",
     ),
+    path("v1/", include(router.urls)),
 ]
