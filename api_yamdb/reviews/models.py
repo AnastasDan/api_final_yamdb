@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Category(models.Model):
     name = models.CharField(max_length=200, verbose_name='Категория')
     slug = models.SlugField(unique=True, verbose_name='URL')
@@ -22,6 +23,30 @@ class Title(models.Model):
         verbose_name='Жанр')
     year = models.PositiveIntegerField()
 
+class Reviews(models.Model):
+    text = models.TextField("Текст отзыва")
+    score = models.IntegerField()
+    titles = models.ForeignKey(
+        Titles,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+    )
+    pub_date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("pub_date",)
 
 
+class Сomments(models.Model):
+    text = models.TextField("Текст коментария")
+    reviews = models.ForeignKey(
+        Reviews,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    pub_date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ("pub_date",)

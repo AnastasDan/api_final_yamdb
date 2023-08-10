@@ -1,3 +1,23 @@
-from django.shortcuts import render
+from rest_framework import viewsets, permissions
 
-# Create your views here.
+from .models import Reviews, Сomments
+from .serializers import СommentsSerializer, ReviewsSerializer
+from api.permissions import IsReviewAuthorOrModeratorOrAdmin
+
+
+class СommentsViewSet(viewsets.ModelViewSet):
+    queryset = Сomments.objects.all()
+    serializer_class = СommentsSerializer
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsReviewAuthorOrModeratorOrAdmin,
+    )
+
+
+class ReviewsViewSet(viewsets.ModelViewSet):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsReviewAuthorOrModeratorOrAdmin,
+    )
