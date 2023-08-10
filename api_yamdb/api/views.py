@@ -1,7 +1,7 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 
-from rest_framework import filters, mixins, status, viewsets
+from rest_framework import filters, mixins, status, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -9,14 +9,19 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from users.models import User
 
-from .permissions import IsAdminUser
-from .serializers import SignupSerializer, TokenSerializer, UserSerializer
+from .permissions import IsAdminUser, IsReviewAuthorOrModeratorOrAdmin
+from .serializers import (
+    SignupSerializer,
+    TokenSerializer,
+    UserSerializer,
+    ReviewsSerializer,
+    СommentsSerializer,
+)
 from .utils import send_confirmation_email
+from reviews.models import Reviews, Сomments
 
 
-class SignupView(
-    mixins.CreateModelMixin, viewsets.GenericViewSet
-):
+class SignupView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = SignupSerializer
     permission_classes = (AllowAny,)
@@ -116,3 +121,21 @@ class UserViewSet(
             )
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class СommentsViewSet(viewsets.ModelViewSet):
+    queryset = Сomments.objects.all()
+    serializer_class = СommentsSerializer
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsReviewAuthorOrModeratorOrAdmin,
+    )
+
+
+class ReviewsViewSet(viewsets.ModelViewSet):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewsSerializer
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsReviewAuthorOrModeratorOrAdmin,
+    )

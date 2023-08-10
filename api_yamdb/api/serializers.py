@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from users.models import User
+from reviews.models import Reviews, Сomments
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -42,3 +43,15 @@ class UserSerializer(serializers.ModelSerializer):
         if username == "me":
             raise serializers.ValidationError("Использовать имя me запрещено.")
         return data
+
+
+class СommentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = Сomments
+
+
+class ReviewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = Reviews
