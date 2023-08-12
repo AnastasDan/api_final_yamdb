@@ -1,39 +1,84 @@
 from django.db import models
+from django.utils import timezone
+from django.core.validators import (
+    MinValueValidator,
+    MaxValueValidator,
+    RegexValidator,
+)
 
 from users.models import User
 
 
+def validate_year(value):
+    current_year = timezone.now().year
+    if current_year < value:
+        raise models.ValidationError(f"Год выпуска больше {current_year}")
+
+
 class Category(models.Model):
-    name = models.CharField(max_length=200, verbose_name="Категория")
-    slug = models.SlugField(unique=True, verbose_name="URL")
+    name = models.CharField(max_length=256, verbose_name="Категория")
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        verbose_name="URL",
+        validators=[
+            RegexValidator(
+                regex="^[-a-zA-Z0-9_]+$",
+                message=(
+                    "Slug может содержать только латинские буквы, "
+                    "цифры, дефисы и подчеркивания."
+                ),
+            )
+        ],
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=200, verbose_name="Жанр")
-    slug = models.SlugField(unique=True, verbose_name="URL")
+    name = models.CharField(max_length=256, verbose_name="Жанр")
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        verbose_name="URL",
+        validators=[
+            RegexValidator(
+                regex="^[-a-zA-Z0-9_]+$",
+                message=(
+                    "Slug может содержать только латинские буквы, "
+                    "цифры, дефисы и подчеркивания."
+                ),
+            )
+        ],
+    )
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=200, verbose_name="Произведение")
+    name = models.CharField(max_length=256, verbose_name="Произведение")
     category = models.ForeignKey(
         Category,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="categories",
         verbose_name="Категория",
     )
-    genre = models.ForeignKey(
+    genre = models.ManyToManyField(
         Genre,
-        on_delete=models.CASCADE,
-        related_name="genres",
+        related_name="titles",
         verbose_name="Жанр",
     )
-    year = models.PositiveIntegerField()
+    description = models.TextField(
+        blank=True, null=True, verbose_name="Описание"
+    )
+    year = models.PositiveIntegerField(validators=[validate_year])
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     text = models.TextField("Текст отзыва")
     score = models.IntegerField()
-    titles = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name="reviews",
@@ -43,12 +88,17 @@ class Reviews(models.Model):
 
     class Meta:
         ordering = ("pub_date",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["title", "author"], name="uniq_review"
+            )
+        ]
 
 
-class Сomments(models.Model):
+class Сomment(models.Model):
     text = models.TextField("Текст коментария")
-    reviews = models.ForeignKey(
-        Reviews,
+    review = models.ForeignKey(
+        Review,
         on_delete=models.CASCADE,
         related_name="comments",
     )
