@@ -1,32 +1,35 @@
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django.db.models import Avg
 
+from reviews.models import Category, Genre, Review, Title, Сomment
 from users.models import User
 
+from .filters import TitleFilter
 from .permissions import (
+    IsAdminOrReadOnly,
     IsAdminUser,
     IsReviewAuthorOrModeratorOrAdmin,
-    IsAdminOrReadOnly,
 )
 from .serializers import (
-    SignupSerializer,
-    TokenSerializer,
-    UserSerializer,
-    ReviewsSerializer,
-    СommentsSerializer,
     CategorySerializer,
     GenreSerializer,
+    ReviewsSerializer,
+    SignupSerializer,
+    TitleGETSerializer,
     TitleSerializer,
+    TokenSerializer,
+    UserSerializer,
+    СommentsSerializer,
 )
 from .utils import send_confirmation_email
-from reviews.models import Review, Сomment, Category, Genre, Title
 
 
 class SignupView(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -198,5 +201,11 @@ class GenreViewSet(
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg("reviews__score"))
     serializer_class = TitleSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    lookup_field = "titles_id"
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ("create", "partial_update"):
+            return TitleSerializer
+        return TitleGETSerializer
