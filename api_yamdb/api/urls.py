@@ -3,14 +3,14 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .views import (
-    CustomTokenObtainPairView,
-    SignupView,
-    UserViewSet,
-    ReviewsViewSet,
-    СommentsViewSet,
-    TitleViewSet,
-    GenreViewSet,
     CategoryViewSet,
+    CustomTokenObtainPairView,
+    GenreViewSet,
+    ReviewsViewSet,
+    SignupView,
+    TitleViewSet,
+    UserViewSet,
+    СommentsViewSet,
 )
 
 router = routers.DefaultRouter()

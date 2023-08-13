@@ -70,14 +70,19 @@ class Title(models.Model):
         verbose_name="Жанр",
     )
     description = models.TextField(
-        blank=True, null=True, verbose_name="Описание"
+        blank=True, verbose_name="Описание"
     )
     year = models.PositiveIntegerField(validators=[validate_year])
 
 
 class Review(models.Model):
     text = models.TextField("Текст отзыва")
-    score = models.IntegerField()
+    score = models.IntegerField("Оценка",
+        validators=[
+            MaxValueValidator(10, 'Значение должно быть до 10'),
+            MinValueValidator(1, 'Значение должно быть от 1')
+        ]
+    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,

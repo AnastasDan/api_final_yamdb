@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
+from reviews.models import Category, Genre, Review, Title, Сomment
 from users.models import User
-from reviews.models import Review, Сomment, Category, Genre, Title
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -74,10 +74,21 @@ class ReviewsSerializer(serializers.ModelSerializer):
         fields = "__all__"
         model = Review
 
+    def validate(self, data):
+        if not self.context.get("request").method == "POST":
+            return data
+        author = self.context.get("request").user
+        title_id = self.context.get("view").kwargs.get("title_id")
+        existing_reviews = Review.objects.filter(author=author, title=title_id)
+        if existing_reviews.exists():
+            raise serializers.ValidationError(
+                "Пользователь уже оставил отзыв на это произведение."
+            )
+        return data
+
 
 class CategorySerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=256)
-    slug = serializers.RegexField(regex="^[-a-zA-Z0-9_]+$", max_length=50)
 
     class Meta:
         fields = (
@@ -89,10 +100,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=256)
-    slug = serializers.RegexField(regex="^[-a-zA-Z0-9_]+$", max_length=50)
 
     class Meta:
-        fields = "__all__"
+        exclude = ("id",)
         model = Genre
 
 
@@ -103,6 +113,16 @@ class TitleSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field="slug"
     )
+    rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        fields = "__all__"
+        model = Title
+
+
+class TitleGETSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
