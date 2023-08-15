@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Review, Title, Сomment
-from users.models import User
+from users.models import USERNAME_REGEX, User
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -12,16 +12,15 @@ class SignupSerializer(serializers.ModelSerializer):
         )
         model = User
 
-    def validate(self, data):
-        username = data.get("username")
-        if username == "me":
+    def validate_username(self, obj):
+        if obj == "me":
             raise serializers.ValidationError("Использовать имя me запрещено.")
-        return data
+        return obj
 
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.RegexField(
-        regex=r"^[\w.@+-]+$", max_length=150, required=True
+        regex=USERNAME_REGEX, max_length=150, required=True
     )
     confirmation_code = serializers.CharField(required=True)
 
@@ -45,33 +44,25 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
-class СommentsSerializer(serializers.ModelSerializer):
-    review = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field="text",
-    )
+class CommentsSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field="username",
     )
 
     class Meta:
-        fields = "__all__"
+        exclude = ("review",)
         model = Сomment
 
 
 class ReviewsSerializer(serializers.ModelSerializer):
-    title = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field="name",
-    )
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field="username",
     )
 
     class Meta:
-        fields = "__all__"
+        exclude = ("title",)
         model = Review
 
     def validate(self, data):
@@ -88,8 +79,6 @@ class ReviewsSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256)
-
     class Meta:
         fields = (
             "name",
@@ -99,7 +88,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=256)
 
     class Meta:
         exclude = ("id",)
@@ -108,8 +96,9 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class TitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
-        many=True, queryset=Genre.objects.all(), slug_field="slug"
-    )
+        many=True,
+        queryset=Genre.objects.all(),
+        slug_field='slug')
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field="slug"
     )

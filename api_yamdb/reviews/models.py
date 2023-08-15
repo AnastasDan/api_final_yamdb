@@ -1,61 +1,60 @@
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
-    RegexValidator,
+    validate_slug,
 )
 from django.db import models
-from django.utils import timezone
 
 from users.models import User
 
-
-def validate_year(value):
-    current_year = timezone.now().year
-    if current_year < value:
-        raise models.ValidationError(f"Год выпуска больше {current_year}")
+from .constants import MAX_LENGTH_50, MAX_LENGTH_256
+from .validators import validate_year
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=256, verbose_name="Категория")
+class BaseSlugModel(models.Model):
     slug = models.SlugField(
         unique=True,
-        max_length=50,
+        max_length=MAX_LENGTH_50,
         verbose_name="URL",
         validators=[
-            RegexValidator(
-                regex="^[-a-zA-Z0-9_]+$",
-                message=(
-                    "Slug может содержать только латинские буквы, "
-                    "цифры, дефисы и подчеркивания."
-                ),
-            )
+            validate_slug,
         ],
     )
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseSlugModel):
+    name = models.CharField(
+        max_length=MAX_LENGTH_256, verbose_name="Категория"
+    )
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
+        ordering = ("id",)
 
     def __str__(self):
         return self.name
 
 
-class Genre(models.Model):
-    name = models.CharField(max_length=256, verbose_name="Жанр")
-    slug = models.SlugField(
-        unique=True,
-        max_length=50,
-        verbose_name="URL",
-        validators=[
-            RegexValidator(
-                regex="^[-a-zA-Z0-9_]+$",
-                message=(
-                    "Slug может содержать только латинские буквы, "
-                    "цифры, дефисы и подчеркивания."
-                ),
-            )
-        ],
-    )
+class Genre(BaseSlugModel):
+    name = models.CharField(max_length=MAX_LENGTH_256, verbose_name="Жанр")
+
+    class Meta:
+        verbose_name = "Жанр"
+        verbose_name_plural = "Жанры"
+        ordering = ("id",)
+
+    def __str__(self):
+        return self.name
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=256, verbose_name="Произведение")
+    name = models.CharField(
+        max_length=MAX_LENGTH_256, verbose_name="Произведение"
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -70,12 +69,19 @@ class Title(models.Model):
         verbose_name="Жанр",
     )
     description = models.TextField(blank=True, verbose_name="Описание")
-    year = models.PositiveIntegerField(validators=[validate_year])
+    year = models.PositiveIntegerField(
+        db_index=True, validators=[validate_year]
+    )
+
+    class Meta:
+        verbose_name = "Произведение"
+        verbose_name_plural = "Произведения"
+        ordering = ("id",)
 
 
 class Review(models.Model):
     text = models.TextField("Текст отзыва")
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         "Оценка",
         validators=[
             MaxValueValidator(10, "Значение должно быть до 10"),
@@ -91,6 +97,8 @@ class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
         ordering = ("pub_date",)
         constraints = [
             models.UniqueConstraint(
@@ -100,7 +108,7 @@ class Review(models.Model):
 
 
 class Сomment(models.Model):
-    text = models.TextField("Текст коментария")
+    text = models.TextField("Текст комментария")
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
@@ -110,4 +118,6 @@ class Сomment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
         ordering = ("pub_date",)
