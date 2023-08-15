@@ -5,15 +5,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reviews', '0001_initial'),
+        ("reviews", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='review',
-            name='score',
-            field=models.IntegerField(validators=[django.core.validators.MaxValueValidator(10, 'Значение не может быть выше 10'), django.core.validators.MinValueValidator(1, 'Значение не может быть меньше 1')], verbose_name='Оценка'),
+            model_name="review",
+            name="score",
+            field=models.IntegerField(
+                validators=[
+                    django.core.validators.MaxValueValidator(
+                        10, "Значение не может быть выше 10"
+                    ),
+                    django.core.validators.MinValueValidator(
+                        1, "Значение не может быть меньше 1"
+                    ),
+                ],
+                verbose_name="Оценка",
+            ),
         ),
     ]
