@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Category, Genre, Review, Title, Сomment
+from reviews.models import Category, Genre, Review, Title, Comment
 from users.models import User
 
 from .filters import TitleFilter
@@ -122,7 +122,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
-    queryset = Сomment.objects.all()
+    queryset = Comment.objects.all()
     serializer_class = CommentsSerializer
     permission_classes = (IsReviewAuthorOrModeratorOrAdmin,)
 

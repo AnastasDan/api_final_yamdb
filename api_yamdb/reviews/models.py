@@ -107,7 +107,7 @@ class Review(models.Model):
         ]
 
 
-class Сomment(models.Model):
+class Comment(models.Model):
     text = models.TextField("Текст комментария")
     review = models.ForeignKey(
         Review,
