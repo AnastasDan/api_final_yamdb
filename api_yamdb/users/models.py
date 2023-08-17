@@ -3,8 +3,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 
 from .enums import UserRole
-
-USERNAME_REGEX = r"^[\w.@+-]+$"
+from .constants import USERNAME_REGEX
 
 
 class User(AbstractUser):
@@ -20,8 +19,8 @@ class User(AbstractUser):
     role = models.CharField(
         "Роль",
         max_length=15,
-        choices=UserRole.choices(),
-        default=UserRole.USER.value,
+        choices=UserRole.choices,
+        default=UserRole.USER,
     )
     bio = models.TextField("Биография", blank=True)
 
@@ -32,15 +31,15 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == UserRole.ADMIN.value
+        return self.role == UserRole.ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == UserRole.MODERATOR.value
+        return self.role == UserRole.MODERATOR
 
     @property
     def is_user(self):
-        return self.role == UserRole.USER.value
+        return self.role == UserRole.USER
 
     def __str__(self):
         return self.username

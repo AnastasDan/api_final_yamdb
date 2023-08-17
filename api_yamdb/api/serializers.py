@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
 from reviews.models import Category, Genre, Review, Title, Comment
-from users.models import USERNAME_REGEX, User
+from users.models import User
+
+from users.constants import USERNAME_REGEX
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -12,10 +14,10 @@ class SignupSerializer(serializers.ModelSerializer):
         )
         model = User
 
-    def validate_username(self, obj):
-        if obj == "me":
+    def validate_username(self, username):
+        if username == "me":
             raise serializers.ValidationError("Использовать имя me запрещено.")
-        return obj
+        return username
 
 
 class TokenSerializer(serializers.Serializer):
