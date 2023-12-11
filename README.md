@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)
+![Django](https://img.shields.io/badge/Django-%23092E20.svg?style=flat&logo=django&logoColor=white)
+![Django Rest Framework](https://img.shields.io/badge/Django%20Rest%20Framework-ff1709?style=flat&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?style=flat&logo=github&logoColor=white)
+
 # Проект «YaMDb»
 
 Проект YaMDb собирает отзывы пользователей на произведения. Сами произведения в YaMDb не хранятся, здесь **нельзя посмотреть** фильм или послушать музыку.
@@ -14,48 +19,68 @@
 
 Добавлять отзывы, комментарии и ставить оценки могут только **аутентифицированные** пользователи.
 
-### Как запустить проект:
+## Как запустить проект:
 
-Клонировать репозиторий и перейти в него в командной строке:
-
-```
-git clone <ваша ссылка на репозиторий>
-```
+Клонируем себе репозиторий:
 
 ```
-cd api_yamdb
+git clone git@github.com:AnastasDan/api_final_yamdb.git
 ```
 
-Cоздать и активировать виртуальное окружение:
+Переходим в директорию:
 
 ```
-python -m venv venv
+cd api_final_yamdb
 ```
 
-```
-source venv/Scripts/activate
-```
+Cоздаем и активируем виртуальное окружение:
 
-Установить зависимости из файла requirements.txt:
+* Если у вас Linux/MacOS:
+
+    ```
+    python3 -m venv venv
+    ```
+
+    ```
+    source venv/bin/activate
+    ```
+
+* Если у вас Windows:
+
+    ```
+    python -m venv venv
+    ```
+
+    ```
+    source venv/Scripts/activate
+    ```
+
+Устанавливаем зависимости из файла requirements.txt:
 
 ```
 pip install -r requirements.txt
 ```
 
-Выполнить миграции:
+Создаем файл .env и заполняем его. Список данных указан в файле env.example.
+
+Выполняем миграции:
 
 ```
 python manage.py migrate
 ```
 
-Запустить проект:
+Запускаем проект:
 
 ```
 python manage.py runserver
 ```
 
-### Где посмотреть примеры запросов к API:
+## Где посмотреть примеры запросов к API:
 
 После запуска проекта переходим по этой ссылке:
 
 http://127.0.0.1:8000/redoc/
+
+## Автор проекта
+
+[Anastas Danielian](https://github.com/AnastasDan)
