@@ -81,6 +81,10 @@ python manage.py runserver
 
 http://127.0.0.1:8000/redoc/
 
-## Автор проекта
+## Авторы проекта
 
-[Anastas Danielian](https://github.com/AnastasDan)
+[Anastas Danielian](https://github.com/AnastasDan) - отвечал за всю часть, касающуюся управления пользователями: систему регистрации и аутентификации, права доступа, работу с токеном, систему подтверждения через e-mail. Реализовал импорт данных из csv файлов.
+
+[Artem Bushmin](https://github.com/ArtemBushmin) - работал над моделями, view и эндпойнтами для произведений, категорий и жанров.
+
+[Vladislav Kornilov](https://github.com/vladkorn1) - работал над моделями, view и эндпойнтами для отзывов, комментариев и рейтинга произведений.
